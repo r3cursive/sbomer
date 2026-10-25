@@ -10,6 +10,7 @@ import { checkout } from "./clone";
 import { scanDeps, type Bom } from "./layers/deps";
 import { gaps, purlTypes } from "./inspect";
 import { normalize } from "./bom";
+import { addComponents, resolvePython } from "./layers/resolve";
 import { pick } from "./pick";
 import * as dt from "./dt";
 
@@ -44,7 +45,13 @@ async function resolveTarget(t: Target): Promise<{ dir: string; project: string;
 async function scan(t: Target): Promise<void> {
   const started = Date.now();
   const { dir, project, version } = await resolveTarget(t);
-  const { bom, dropped } = normalize(await scanDeps(dir));
+  let raw = await scanDeps(dir);
+  if (config().scan.resolve_unlocked_python) {
+    const r = await resolvePython(dir);
+    raw = addComponents(raw, r.components);
+    for (const f of r.failed) console.error(`  resolve skipped ${f}`);
+  }
+  const { bom, dropped } = normalize(raw);
   const out = bomPath(project);
   await mkdir(dirname(out), { recursive: true });
   await Bun.write(out, JSON.stringify(bom));

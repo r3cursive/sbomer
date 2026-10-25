@@ -27,3 +27,6 @@ targets:
   - repo: servo/servo
     ref: main
     shape: loop pick (Rust)
+  - repo: 3b1b/manim
+    ref: master
+    shape: loop pick (Python)

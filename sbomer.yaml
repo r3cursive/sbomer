@@ -21,6 +21,9 @@ scan:
   targets_file: targets.yaml
   work_dir: work
   bom_wait_seconds: 300
+  # syft skips requirements without an exact pin. When a repo has no Python lockfile, resolve unlocked
+  # requirements*.txt with `uv pip compile --no-build` (metadata only, no package code runs). See postmortem 002.
+  resolve_unlocked_python: true
 
 # The improvement loop picks random public repos to find gaps. See docs/POSTMORTEMS.md.
 loop:

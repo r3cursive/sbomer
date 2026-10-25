@@ -16,3 +16,6 @@ Read this before every loop iteration. Each line is a single imperative lesson w
 - **L7** Count coverage against real dependencies. A build tool in the BOM (the Gradle wrapper) does not prove the build resolved. *(001)*
 - **L8** Filter BOMs before upload. Components DT can't match inflate counts and hide gaps. *(001)*
 - **L9** Scope every tool that walks the tree (tsc, linters, tests) away from `work/`, which holds untrusted clones. *(001)*
+- **L10** Treat "the scanner found nothing" as a finding about the scanner until a manifest proves otherwise. *(002)*
+- **L11** Never accept a guessed version. Resolve it for real or leave it out: a wrong version is worse than a missing one. *(002)*
+- **L12** Label every component sbomer infers with how it was obtained (`sbomer:resolution`), so locked and resolved results stay distinguishable. *(002)*
