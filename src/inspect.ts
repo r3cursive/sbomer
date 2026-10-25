@@ -1,6 +1,7 @@
 // Compares what a BOM caught against the manifests present in the repo, so gaps are visible per ecosystem.
 import { readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import { config } from "./config";
 import type { Bom } from "./layers/deps";
 
 // Manifest file → the purl type syft should produce for it.
@@ -19,7 +20,11 @@ export const MANIFESTS: [RegExp, string][] = [
 
 const SKIP_DIRS = new Set([".git", "node_modules", "vendor", "target", "dist", "build", ".venv"]);
 
-export function manifestsIn(dir: string): Map<string, string[]> {
+export function isExcluded(rel: string, globs: string[] = config().scan.exclude): boolean {
+  return globs.some((g) => new Bun.Glob(g).match(rel));
+}
+
+export function manifestsIn(dir: string, globs: string[] = config().scan.exclude): Map<string, string[]> {
   const found = new Map<string, string[]>();
   const walk = (d: string) => {
     for (const name of readdirSync(d)) {
@@ -30,6 +35,7 @@ export function manifestsIn(dir: string): Map<string, string[]> {
         if (!SKIP_DIRS.has(name)) walk(p);
         continue;
       }
+      if (isExcluded(relative(dir, p), globs)) continue;
       for (const [re, type] of MANIFESTS) {
         if (re.test(name)) {
           const list = found.get(type) ?? [];

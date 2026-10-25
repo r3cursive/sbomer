@@ -19,3 +19,5 @@ Read this before every loop iteration. Each line is a single imperative lesson w
 - **L10** Treat "the scanner found nothing" as a finding about the scanner until a manifest proves otherwise. *(002)*
 - **L11** Never accept a guessed version. Resolve it for real or leave it out: a wrong version is worse than a missing one. *(002)*
 - **L12** Label every component sbomer infers with how it was obtained (`sbomer:resolution`), so locked and resolved results stay distinguishable. *(002)*
+- **L13** Ask where a component came from before counting it. Its path is the cheapest signal of whether it's real or a fixture. *(003)*
+- **L14** Check that a tool applied a filter by counting what's left. syft silently ignored excludes without a leading `./`. *(003)*

@@ -30,3 +30,6 @@ targets:
   - repo: 3b1b/manim
     ref: master
     shape: loop pick (Python)
+  - repo: aquasecurity/trivy
+    ref: main
+    shape: loop pick (Go)

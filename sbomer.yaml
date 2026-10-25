@@ -24,6 +24,16 @@ scan:
   # syft skips requirements without an exact pin. When a repo has no Python lockfile, resolve unlocked
   # requirements*.txt with `uv pip compile --no-build` (metadata only, no package code runs). See postmortem 002.
   resolve_unlocked_python: true
+  # Directories that hold test fixtures rather than real dependencies. Scanner and parser repos ship
+  # deliberately vulnerable lockfiles here (trivy: 56% of components). Passed to syft --exclude and
+  # applied to inspect and the Python resolver. See postmortem 003.
+  exclude:
+    - "**/testdata/**"
+    - "**/__fixtures__/**"
+    - "**/__snapshots__/**"
+    - "**/test/fixtures/**"
+    - "**/tests/fixtures/**"
+    - "**/spec/fixtures/**"
 
 # The improvement loop picks random public repos to find gaps. See docs/POSTMORTEMS.md.
 loop:

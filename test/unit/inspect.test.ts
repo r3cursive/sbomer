@@ -32,3 +32,12 @@ test("Gradle with real components but no lockfile is still flagged", () => {
   const bom = { bomFormat: "CycloneDX" as const, specVersion: "1.6", components: [{ purl: "pkg:maven/com.google/guava@33" }] };
   expect(gaps(dir, bom).gaps[0]?.reason).toBe("build files without a lockfile");
 });
+
+test("fixture directories are excluded, real test requirements are not (trivy, 003)", async () => {
+  const { isExcluded } = await import("../../src/inspect");
+  const globs = ["**/testdata/**", "**/test/fixtures/**"];
+  expect(isExcluded("pkg/fanal/analyzer/language/python/pip/testdata/requirements.txt", globs)).toBe(true);
+  expect(isExcluded("test/fixtures/package-lock.json", globs)).toBe(true);
+  expect(isExcluded("test/requirements.txt", globs)).toBe(false);
+  expect(isExcluded("go.mod", globs)).toBe(false);
+});
