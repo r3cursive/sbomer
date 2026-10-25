@@ -33,3 +33,6 @@ targets:
   - repo: aquasecurity/trivy
     ref: main
     shape: loop pick (Go)
+  - repo: impress/impress.js
+    ref: master
+    shape: loop pick (JavaScript)

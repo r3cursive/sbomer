@@ -21,3 +21,6 @@ Read this before every loop iteration. Each line is a single imperative lesson w
 - **L12** Label every component sbomer infers with how it was obtained (`sbomer:resolution`), so locked and resolved results stay distinguishable. *(002)*
 - **L13** Ask where a component came from before counting it. Its path is the cheapest signal of whether it's real or a fixture. *(003)*
 - **L14** Check that a tool applied a filter by counting what's left. syft silently ignored excludes without a leading `./`. *(003)*
+- **L15** Check a repo's age and lifetime star rate before trusting its star count. *(004)*
+- **L16** Know each scanner's default scope. syft's npm default leaves out dev dependencies, and dev and CI installs are an attack path. *(004)*
+- **L17** Close an open assumption with one API call as soon as it blocks a design choice. DT does keep `sbomer:*` properties. *(004)*

@@ -12,8 +12,14 @@ export type Config = {
     images: { postgres: string; apiserver: string; frontend: string };
   };
   sources: { osv: { enabled: boolean; ecosystems: string[] } };
-  scan: { targets_file: string; work_dir: string; bom_wait_seconds: number; resolve_unlocked_python: boolean; exclude: string[] };
-  loop: { languages: string[]; min_stars: number; pushed_within_days: number };
+  scan: { targets_file: string; work_dir: string; bom_wait_seconds: number; resolve_unlocked_python: boolean; include_dev_dependencies: boolean; exclude: string[] };
+  loop: {
+    languages: string[];
+    min_stars: number;
+    pushed_within_days: number;
+    min_age_days: number;
+    max_stars_per_day: number;
+  };
 };
 
 type Obj = Record<string, unknown>;

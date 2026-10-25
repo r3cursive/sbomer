@@ -24,6 +24,9 @@ scan:
   # syft skips requirements without an exact pin. When a repo has no Python lockfile, resolve unlocked
   # requirements*.txt with `uv pip compile --no-build` (metadata only, no package code runs). See postmortem 002.
   resolve_unlocked_python: true
+  # syft drops npm dev dependencies by default. Dev and CI installs are an attack path (install scripts),
+  # so include them and tag them sbomer:scope=dev. See postmortem 004.
+  include_dev_dependencies: true
   # Directories that hold test fixtures rather than real dependencies. Scanner and parser repos ship
   # deliberately vulnerable lockfiles here (trivy: 56% of components). Passed to syft --exclude and
   # applied to inspect and the Python resolver. See postmortem 003.
@@ -40,3 +43,7 @@ loop:
   languages: [Go, TypeScript, JavaScript, Python, Java, Kotlin, Rust, PHP, Ruby, C#]
   min_stars: 200
   pushed_within_days: 180
+  # Star-farmed repos pass a plain star filter. Skip repos younger than min_age_days or gaining stars faster
+  # than max_stars_per_day over their lifetime. See postmortem 004.
+  min_age_days: 365
+  max_stars_per_day: 100

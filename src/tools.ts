@@ -58,8 +58,9 @@ async function versionOf(bin: string): Promise<string | undefined> {
   return /Version:\s+(\S+)/.exec(p.stdout.toString())?.[1];
 }
 
-export async function run(cmd: string[], opts: { cwd?: string } = {}): Promise<string> {
-  const p = Bun.spawn(cmd, { cwd: opts.cwd, stdout: "pipe", stderr: "pipe" });
+export async function run(cmd: string[], opts: { cwd?: string; env?: Record<string, string> } = {}): Promise<string> {
+  const env = opts.env ? { ...process.env, ...opts.env } : undefined;
+  const p = Bun.spawn(cmd, { cwd: opts.cwd, env, stdout: "pipe", stderr: "pipe" });
   const [out, err, code] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text(), p.exited]);
   if (code !== 0) throw new Error(`${cmd.join(" ")} exited ${code}: ${err.trim()}`);
   return out;

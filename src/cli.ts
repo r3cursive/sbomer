@@ -11,6 +11,7 @@ import { scanDeps, type Bom } from "./layers/deps";
 import { gaps, purlTypes } from "./inspect";
 import { normalize } from "./bom";
 import { addComponents, resolvePython } from "./layers/resolve";
+import { tagDev } from "./layers/scope";
 import { pick } from "./pick";
 import * as dt from "./dt";
 
@@ -51,7 +52,8 @@ async function scan(t: Target): Promise<void> {
     raw = addComponents(raw, r.components);
     for (const f of r.failed) console.error(`  resolve skipped ${f}`);
   }
-  const { bom, dropped } = normalize(raw);
+  const { bom: tagged, tagged: devCount } = tagDev(raw, dir);
+  const { bom, dropped } = normalize(tagged);
   const out = bomPath(project);
   await mkdir(dirname(out), { recursive: true });
   await Bun.write(out, JSON.stringify(bom));
@@ -61,7 +63,7 @@ async function scan(t: Target): Promise<void> {
   const count = await dt.componentCount(p.uuid);
   const types = [...purlTypes(bom)].map(([k, v]) => `${k}=${v}`).join(" ");
   const secs = ((Date.now() - started) / 1000).toFixed(1);
-  console.log(`${project}@${version.slice(0, 12)}  dt_components=${count}  ${types}  dropped=${dropped}  (${secs}s)`);
+  console.log(`${project}@${version.slice(0, 12)}  dt_components=${count}  ${types}  dev=${devCount}  dropped=${dropped}  (${secs}s)`);
 }
 
 async function inspect(t: Target): Promise<void> {

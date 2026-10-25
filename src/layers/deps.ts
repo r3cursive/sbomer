@@ -8,6 +8,7 @@ export async function scanDeps(dir: string): Promise<Bom> {
   const syft = await installTool("syft");
   // syft matches --exclude against paths relative to the scan root, which need a leading "./".
   const excludes = config().scan.exclude.flatMap((g) => ["--exclude", g.startsWith("**") ? `./${g}` : g]);
-  const out = await run([syft, "scan", `dir:${dir}`, "-o", "cyclonedx-json", "-q", ...excludes]);
+  const env = { SYFT_JAVASCRIPT_INCLUDE_DEV_DEPENDENCIES: String(config().scan.include_dev_dependencies) };
+  const out = await run([syft, "scan", `dir:${dir}`, "-o", "cyclonedx-json", "-q", ...excludes], { env });
   return JSON.parse(out) as Bom;
 }
