@@ -55,3 +55,7 @@ Each loop iteration scans a random public repo, fixes the biggest gap it finds, 
 ## Supply chain
 
 Scanner binaries are downloaded into `./bin` and checked against the sha256 values in `tools.lock.json`. Container images are pinned by digest in `sbomer.yaml`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
