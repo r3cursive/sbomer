@@ -52,7 +52,8 @@ The only source of components was package manifests. A runtime declared in a Doc
 |---|---|---|---|
 | 1 | Resolve runtimes from Dockerfile FROM via image env (php, node, python, go, ruby, openjdk) | done | `test/unit/runtimes.test.ts`, Wallos `php@8.3.36` |
 | 2 | Report images that can't be inspected instead of dropping them | done | `runtime unresolved` lines, unit test |
-| 3 | Add the PHP runtime to the canary | done | `fixtures/canary/Dockerfile`; e2e assertion for CVE-2026-109618 is next |
+| 3 | Add the PHP runtime to the canary, with an e2e assertion for CVE-2026-109618/109619 | done | `test/e2e/canary.test.ts` |
+| 3a | Make e2e scan the canary at the current commit, and accept 409 from `analyze` | done | both failed on the first run after commit `2f82b0c` |
 | 4 | Make `inspect` flag a language repo whose own language has no components (Wallos: PHP app, 0 PHP) | open | |
 | 5 | Catalog vendored libraries (`libs/`, `vendor/` without a lockfile) | open | needs a file-signature approach |
 | 6 | Suppress or downrank all-versions NVD entries like CVE-2007-3205 on modern runtimes | open | stage 3 report |
@@ -60,6 +61,7 @@ The only source of components was package manifests. A runtime declared in a Doc
 
 ## Lessons
 
+- Run the e2e suite before pushing. This iteration pushed `2f82b0c` before seeing two e2e failures (a stale canary version and an unhandled 409). Both are fixed in the follow-up commits.
 - Derive coverage expectations from the repo's language and build files, not just its package manifests. What the manifests leave out is the gap.
 - Resolve floating image tags from the image's own metadata. It's exact, and nothing gets pulled or run.
 - Expect NVD entries that match every version. Rank them, don't trust them.

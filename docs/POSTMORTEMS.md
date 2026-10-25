@@ -22,7 +22,7 @@ A notes file nobody reads changes nothing, so the loop puts two gates on it:
 5. Fix the biggest gap, or log it as an action item when it's too big for one iteration.
 6. Write `docs/postmortems/NNN-<slug>.md` from `TEMPLATE.md`.
 7. Fold new lessons into `LESSONS.md`. Merge duplicates, and keep it short.
-8. `bun test` and `bun run typecheck`, then commit and push.
+8. `bun test test/unit`, `bun run typecheck` and `bun run test:e2e` must all pass. Then commit and push (L21).
 
 ## Public safety
 

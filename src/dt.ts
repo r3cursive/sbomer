@@ -156,5 +156,8 @@ export async function componentCount(projectUuid: string): Promise<number> {
 }
 
 export async function analyze(projectUuid: string): Promise<void> {
-  await call(`/v1/finding/project/${projectUuid}/analyze`, { method: "POST", apiKey: apiKey() });
+  await call(`/v1/finding/project/${projectUuid}/analyze`, { method: "POST", apiKey: apiKey() }).catch((e) => {
+    // 409 means an analysis is already running for this project, which is what we asked for.
+    if (!String(e).includes("HTTP 409")) throw e;
+  });
 }

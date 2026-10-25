@@ -27,3 +27,4 @@ Read this before every loop iteration. Each line is a single imperative lesson w
 - **L18** Derive coverage expectations from the repo's language and build files, not just its package manifests. What the manifests leave out is the gap. *(005)*
 - **L19** Resolve floating image tags from the image's own env (`skopeo inspect`). It's exact, and nothing gets pulled or run. *(005)*
 - **L20** Expect NVD entries that match every version. Rank them, don't trust them. *(005)*
+- **L21** Treat 409 from DT's analyze endpoint as "already running", and make e2e suites set up their own state (scan at the current commit) instead of relying on the last manual run. *(005)*
