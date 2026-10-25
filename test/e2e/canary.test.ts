@@ -1,10 +1,16 @@
 // Needs a running stack (`sbomer setup`) with vuln mirrors populated. Each issue from the week of
 // 2026-10-19 that sbomer can see gets an expectation here; stage 2 adds PHP, Node and GitLab.
-import { expect, test } from "bun:test";
+import { beforeAll, expect, test } from "bun:test";
 import * as dt from "../../src/dt";
 
 const PROJECT = "sbomer/fixtures/canary";
 const version = Bun.spawnSync(["git", "rev-parse", "HEAD"]).stdout.toString().trim();
+
+// The canary project is versioned by sbomer's commit, so scan it at this commit before asserting.
+beforeAll(() => {
+  const p = Bun.spawnSync(["bun", "src/cli.ts", "scan", "fixtures/canary"], { stdout: "inherit", stderr: "inherit" });
+  if (p.exitCode !== 0) throw new Error("canary scan failed");
+}, 120_000);
 
 test("stage 1: Python Brotli 1.0.7 is flagged (CVE-2020-8927)", async () => {
   const p = await dt.lookupProject(PROJECT, version);
