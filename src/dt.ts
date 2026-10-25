@@ -8,7 +8,9 @@ const ENV_FILE = join(ROOT, ".env");
 const BASE = process.env.DT_URL ?? `http://127.0.0.1:${config().stack.api_port}`;
 
 // The Automation team is created by DT on first boot. These are the permissions sbomer needs on top of its defaults.
-const AUTOMATION_PERMISSIONS = ["BOM_UPLOAD", "PROJECT_CREATION_UPLOAD", "VIEW_PORTFOLIO", "VIEW_VULNERABILITY"];
+const AUTOMATION_PERMISSIONS = [
+  "BOM_UPLOAD", "PROJECT_CREATION_UPLOAD", "VIEW_PORTFOLIO", "VIEW_VULNERABILITY", "VULNERABILITY_ANALYSIS",
+];
 
 async function call<T>(path: string, init: RequestInit & { token?: string; apiKey?: string } = {}): Promise<T> {
   const headers = new Headers(init.headers);
@@ -51,10 +53,30 @@ export async function enableSources(token: string): Promise<void> {
   });
 }
 
-// First run only: rotate the default admin password, then mint an Automation team API key. Both go to .env.
+type Team = { uuid: string; name: string; permissions: { name: string }[] };
+
+async function automationTeam(token: string): Promise<Team> {
+  const teams = await call<Team[]>("/v1/team", { token });
+  const automation = teams.find((t) => t.name === "Automation");
+  if (!automation) throw new Error("Automation team not found");
+  return automation;
+}
+
+// Grants whatever AUTOMATION_PERMISSIONS lists that the team lacks, so new permissions reach existing installs.
+async function syncPermissions(token: string, team: Team): Promise<void> {
+  const have = new Set(team.permissions.map((p) => p.name));
+  for (const perm of AUTOMATION_PERMISSIONS.filter((p) => !have.has(p))) {
+    await call(`/v1/permission/${perm}/team/${team.uuid}`, { method: "POST", token });
+  }
+}
+
+// First run rotates the default admin password and mints an Automation team API key, both into .env.
+// Every run re-syncs permissions and sources.
 export async function bootstrap(): Promise<void> {
   if (process.env.DT_API_KEY) {
-    await enableSources(await adminToken(process.env.DT_ADMIN_PASSWORD ?? ""));
+    const token = await adminToken(process.env.DT_ADMIN_PASSWORD ?? "");
+    await syncPermissions(token, await automationTeam(token));
+    await enableSources(token);
     return;
   }
   const password = crypto.randomUUID() + crypto.randomUUID();
@@ -67,15 +89,9 @@ export async function bootstrap(): Promise<void> {
     }));
   }
   const token = await adminToken(password);
-
-  const teams = await call<{ uuid: string; name: string; permissions: { name: string }[] }[]>("/v1/team", { token });
-  const automation = teams.find((t) => t.name === "Automation");
-  if (!automation) throw new Error("Automation team not found");
-  const have = new Set(automation.permissions.map((p) => p.name));
-  for (const perm of AUTOMATION_PERMISSIONS.filter((p) => !have.has(p))) {
-    await call(`/v1/permission/${perm}/team/${automation.uuid}`, { method: "POST", token });
-  }
-  const key = await call<{ key: string }>(`/v1/team/${automation.uuid}/key`, { method: "PUT", token });
+  const team = await automationTeam(token);
+  await syncPermissions(token, team);
+  const key = await call<{ key: string }>(`/v1/team/${team.uuid}/key`, { method: "PUT", token });
 
   const env = `DT_URL=${BASE}\nDT_ADMIN_PASSWORD=${password}\nDT_API_KEY=${key.key}\n`;
   await Bun.write(ENV_FILE, env);

@@ -19,7 +19,7 @@ Dependency-Track matches the components against NVD and OSV.
 | Stage | What | State |
 |---|---|---|
 | 0 | Pinned tools, local Dependency-Track 5 | done |
-| 1 | Dependency layer → Dependency-Track | in progress |
+| 1 | Dependency layer → Dependency-Track | done (canary e2e passes) |
 | 2 | Runtime + service layers | next |
 | 3 | `query` and `report` | |
 | 4+ | Runtime internals, reachability, local-model triage, trust stores | planned |
@@ -33,6 +33,9 @@ bun install
 bun src/cli.ts setup          # fetch pinned syft, start Dependency-Track, create .env with an API key
 bun src/cli.ts scan --all     # scan every target in targets.yaml
 bun src/cli.ts scan fixtures/canary
+bun src/cli.ts scan owner/repo[@ref] # ad hoc
+bun src/cli.ts inspect <target>  # manifests in the repo vs ecosystems in the BOM
+bun src/cli.ts pick [language]   # random public repo for the improvement loop
 bun run test:e2e              # known-answer checks against the canary fixture
 bun src/cli.ts down
 ```
@@ -44,6 +47,10 @@ UI: http://127.0.0.1:8080. API: http://127.0.0.1:8081. Both are bound to localho
 ## Test matrix
 
 `targets.yaml` lists public repos picked for their different shapes: Go single module (Twitch), pnpm monorepo (Palantir Blueprint), Gradle with `versions.lock` (Palantir Conjure), Go multi-module with compose files (Datadog Agent), a polyglot monorepo (AWS CDK), and Python/npm services with Dockerfiles (Duolingo). `fixtures/canary` holds deliberately old versions with known answers.
+
+## Improving in public
+
+Each loop iteration scans a random public repo, fixes the biggest gap it finds, and writes a blameless postmortem. See [docs/POSTMORTEMS.md](docs/POSTMORTEMS.md), [docs/LESSONS.md](docs/LESSONS.md) and [docs/postmortems/](docs/postmortems/).
 
 ## Supply chain
 
