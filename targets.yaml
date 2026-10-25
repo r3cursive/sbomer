@@ -1,0 +1,26 @@
+# Test matrix. Each target exercises a different repo shape.
+# ref: branch or tag to clone; scans record the resolved commit sha.
+targets:
+  - repo: twitchtv/twirp
+    ref: main
+    shape: Go single module
+  - repo: palantir/blueprint
+    ref: develop
+    shape: pnpm monorepo + .nvmrc
+  - repo: palantir/conjure-java
+    ref: develop
+    shape: Gradle + versions.lock
+  - repo: DataDog/datadog-agent
+    ref: main
+    shape: Go multi-module, Cargo, many compose files
+  - repo: aws/aws-cdk
+    ref: main
+    shape: polyglot monorepo, many Dockerfiles
+  - repo: duolingo/slack-mcp
+    ref: master
+    shape: Python uv.lock + Dockerfile
+  - repo: duolingo/metasearch
+    ref: master
+    shape: npm + Dockerfile
+  - path: fixtures/canary
+    shape: known-answer fixture for the 2026-10-19 advisories

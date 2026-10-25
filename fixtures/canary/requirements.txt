@@ -1,0 +1,3 @@
+# Known-answer fixture. Versions are deliberately old; nothing here is installed or run.
+Brotli==1.0.7
+certifi==2024.2.2

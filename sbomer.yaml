@@ -1,0 +1,29 @@
+# sbomer configuration. Committed defaults; put machine-specific overrides in sbomer.local.yaml (gitignored).
+# Secrets never go here: `sbomer setup` writes them to .env.
+
+stack:
+  # Dependency-Track 5, run as podman containers on a private network, published on localhost only.
+  network: sbomer-dt
+  api_port: 8081
+  ui_port: 8080
+  images:
+    postgres: docker.io/library/postgres:18-alpine@sha256:898c60cb390d1085bc97bdd6a1ae968757421df394b071848b52b1c09c89d6a5
+    apiserver: ghcr.io/dependencytrack/apiserver@sha256:7411c390182e6e42156ccf2ab033aa9120a1f37b7ce59e8c2da0d77ec23c0a5f # 5.2.0
+    frontend: ghcr.io/dependencytrack/frontend@sha256:7e68cc134284d6206e813212cf2a20c72f438d76f2094c0f05fd5d5e14602dda # 5.2.0
+
+sources:
+  # OSV ships disabled in Dependency-Track. NVD is on by default.
+  osv:
+    enabled: true
+    ecosystems: [PyPI, npm, Go, Maven, NuGet, crates.io, Packagist, RubyGems]
+
+scan:
+  targets_file: targets.yaml
+  work_dir: work
+  bom_wait_seconds: 300
+
+# The improvement loop picks random public repos to find gaps. See docs/POSTMORTEMS.md.
+loop:
+  languages: [Go, TypeScript, JavaScript, Python, Java, Kotlin, Rust, PHP, Ruby, C#]
+  min_stars: 200
+  pushed_within_days: 180
