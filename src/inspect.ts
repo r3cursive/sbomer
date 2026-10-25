@@ -47,26 +47,37 @@ export function manifestsIn(dir: string): Map<string, string[]> {
 export function purlTypes(bom: Bom): Map<string, number> {
   const counts = new Map<string, number>();
   for (const c of (bom.components ?? []) as { purl?: string }[]) {
+    if (c.purl && TOOLING.some((re) => re.test(c.purl!))) continue;
     const type = /^pkg:([^/]+)\//.exec(c.purl ?? "")?.[1] ?? "(no purl)";
     counts.set(type, (counts.get(type) ?? 0) + 1);
   }
   return counts;
 }
 
-export type Gap = { ecosystem: string; manifests: number; components: number; sample: string[] };
+export type Gap = { ecosystem: string; manifests: number; components: number; sample: string[]; reason?: string };
 
-// An ecosystem is a gap when the repo declares manifests for it but the BOM holds no components of that type.
+// Build tooling syft reports in place of real dependencies. Counting it would hide an unresolved build.
+const TOOLING = [/^pkg:maven\/org\.gradle\.wrapper\b/];
+
+// Gradle and Maven builds only resolve to components when a lockfile pins them.
+const JVM_LOCKFILE = /(^|\/)(gradle\.lockfile|versions\.lock|pom\.xml)$/;
+
+// An ecosystem is a gap when the repo declares manifests for it but the BOM holds no components of that type,
+// or when it's a JVM build with no lockfile, which syft can't resolve without running the build.
 export function gaps(dir: string, bom: Bom): { gaps: Gap[]; covered: Gap[] } {
   const man = manifestsIn(dir);
   const types = purlTypes(bom);
-  const rows: Gap[] = [...man.entries()].map(([eco, files]) => ({
-    ecosystem: eco,
-    manifests: files.length,
-    components: types.get(eco.split(" ")[0]!) ?? 0,
-    sample: files.slice(0, 3),
-  }));
-  return {
-    gaps: rows.filter((r) => r.components === 0 && !r.ecosystem.includes("stage 2")),
-    covered: rows.filter((r) => r.components > 0 || r.ecosystem.includes("stage 2")),
-  };
+  const rows: Gap[] = [...man.entries()].map(([eco, files]) => {
+    const row: Gap = {
+      ecosystem: eco,
+      manifests: files.length,
+      components: types.get(eco.split(" ")[0]!) ?? 0,
+      sample: files.slice(0, 3),
+    };
+    if (eco.includes("stage 2")) return row;
+    if (row.components === 0) row.reason = "no components";
+    else if (eco === "maven" && !files.some((f) => JVM_LOCKFILE.test(f))) row.reason = "build files without a lockfile";
+    return row;
+  });
+  return { gaps: rows.filter((r) => r.reason), covered: rows.filter((r) => !r.reason) };
 }

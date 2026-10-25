@@ -24,3 +24,6 @@ targets:
     shape: npm + Dockerfile
   - path: fixtures/canary
     shape: known-answer fixture for the 2026-10-19 advisories
+  - repo: servo/servo
+    ref: main
+    shape: loop pick (Rust)

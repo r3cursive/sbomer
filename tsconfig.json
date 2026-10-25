@@ -6,6 +6,13 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
-    "types": ["bun"]
-  }
+    "types": [
+      "bun"
+    ]
+  },
+  "include": [
+    "src",
+    "scripts",
+    "test"
+  ]
 }

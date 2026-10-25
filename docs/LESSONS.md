@@ -10,3 +10,9 @@ Read this before every loop iteration. Each line is a single imperative lesson w
 - **L4** Expect vuln data sources to ship disabled: DT 5 enables only NVD, so OSV has to be turned on in `sbomer.yaml`. *(stage 0)*
 - **L5** Look up the permission behind each DT endpoint before calling it with the API key. `analyze` needs VULNERABILITY_ANALYSIS, and permissions are synced on every `setup` so new ones reach existing installs. *(stage 1)*
 - **L6** When a safety scanner hits its own test fixtures, assemble them at runtime instead of weakening the pattern. *(stage 0)*
+
+## Loop
+
+- **L7** Count coverage against real dependencies. A build tool in the BOM (the Gradle wrapper) does not prove the build resolved. *(001)*
+- **L8** Filter BOMs before upload. Components DT can't match inflate counts and hide gaps. *(001)*
+- **L9** Scope every tool that walks the tree (tsc, linters, tests) away from `work/`, which holds untrusted clones. *(001)*

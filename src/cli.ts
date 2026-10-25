@@ -9,6 +9,7 @@ import { up, down } from "./stack";
 import { checkout } from "./clone";
 import { scanDeps, type Bom } from "./layers/deps";
 import { gaps, purlTypes } from "./inspect";
+import { normalize } from "./bom";
 import { pick } from "./pick";
 import * as dt from "./dt";
 
@@ -43,7 +44,7 @@ async function resolveTarget(t: Target): Promise<{ dir: string; project: string;
 async function scan(t: Target): Promise<void> {
   const started = Date.now();
   const { dir, project, version } = await resolveTarget(t);
-  const bom = await scanDeps(dir);
+  const { bom, dropped } = normalize(await scanDeps(dir));
   const out = bomPath(project);
   await mkdir(dirname(out), { recursive: true });
   await Bun.write(out, JSON.stringify(bom));
@@ -53,7 +54,7 @@ async function scan(t: Target): Promise<void> {
   const count = await dt.componentCount(p.uuid);
   const types = [...purlTypes(bom)].map(([k, v]) => `${k}=${v}`).join(" ");
   const secs = ((Date.now() - started) / 1000).toFixed(1);
-  console.log(`${project}@${version.slice(0, 12)}  dt_components=${count}  ${types}  (${secs}s)`);
+  console.log(`${project}@${version.slice(0, 12)}  dt_components=${count}  ${types}  dropped=${dropped}  (${secs}s)`);
 }
 
 async function inspect(t: Target): Promise<void> {
@@ -64,7 +65,7 @@ async function inspect(t: Target): Promise<void> {
   const { gaps: missing, covered } = gaps(dir, bom);
   console.log(`${project}`);
   for (const g of covered) console.log(`  ok   ${g.ecosystem}: ${g.manifests} manifests, ${g.components} components`);
-  for (const g of missing) console.log(`  GAP  ${g.ecosystem}: ${g.manifests} manifests, 0 components  e.g. ${g.sample.join(", ")}`);
+  for (const g of missing) console.log(`  GAP  ${g.ecosystem}: ${g.manifests} manifests, ${g.components} components (${g.reason})  e.g. ${g.sample.join(", ")}`);
   if (missing.length) process.exitCode = 3;
 }
 
