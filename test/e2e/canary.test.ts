@@ -17,3 +17,15 @@ test("stage 1: Python Brotli 1.0.7 is flagged (CVE-2020-8927)", async () => {
   const ids = hits.map((f) => f.vulnerability.vulnId);
   expect(ids.some((id) => id === "CVE-2020-8927" || id.startsWith("GHSA-") || id.startsWith("PYSEC-"))).toBe(true);
 }, 150_000);
+
+test("stage 2: PHP 8.1.0 from the canary Dockerfile is flagged for the 2026-10-21 RCEs", async () => {
+  const p = await dt.lookupProject(PROJECT, version);
+  await dt.analyze(p.uuid);
+  let ids: string[] = [];
+  for (let i = 0; i < 60 && !ids.includes("CVE-2026-109618"); i++) {
+    ids = (await dt.findings(p.uuid)).filter((f) => f.component.name === "php").map((f) => f.vulnerability.vulnId);
+    if (!ids.includes("CVE-2026-109618")) await Bun.sleep(2000);
+  }
+  expect(ids).toContain("CVE-2026-109618");
+  expect(ids).toContain("CVE-2026-109619");
+}, 150_000);

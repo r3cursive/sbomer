@@ -36,3 +36,6 @@ targets:
   - repo: impress/impress.js
     ref: master
     shape: loop pick (JavaScript)
+  - repo: ellite/Wallos
+    ref: main
+    shape: loop pick (PHP)

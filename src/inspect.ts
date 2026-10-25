@@ -14,7 +14,7 @@ export const MANIFESTS: [RegExp, string][] = [
   [/^(composer\.lock|composer\.json)$/, "composer"],
   [/^Gemfile\.lock$/, "gem"],
   [/^(packages\.lock\.json|.*\.csproj|packages\.config)$/, "nuget"],
-  [/^(Dockerfile[^/]*|.*\.dockerfile)$/, "docker (stage 2)"],
+  [/^(Dockerfile[^/]*|.*\.dockerfile|Containerfile)$/, "docker (stage 2)"],
   [/^(docker-)?compose[^/]*\.ya?ml$/, "compose (stage 2)"],
 ];
 

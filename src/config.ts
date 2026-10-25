@@ -12,7 +12,7 @@ export type Config = {
     images: { postgres: string; apiserver: string; frontend: string };
   };
   sources: { osv: { enabled: boolean; ecosystems: string[] } };
-  scan: { targets_file: string; work_dir: string; bom_wait_seconds: number; resolve_unlocked_python: boolean; include_dev_dependencies: boolean; exclude: string[] };
+  scan: { targets_file: string; work_dir: string; bom_wait_seconds: number; resolve_unlocked_python: boolean; include_dev_dependencies: boolean; runtimes: boolean; exclude: string[] };
   loop: {
     languages: string[];
     min_stars: number;

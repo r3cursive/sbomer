@@ -24,3 +24,6 @@ Read this before every loop iteration. Each line is a single imperative lesson w
 - **L15** Check a repo's age and lifetime star rate before trusting its star count. *(004)*
 - **L16** Know each scanner's default scope. syft's npm default leaves out dev dependencies, and dev and CI installs are an attack path. *(004)*
 - **L17** Close an open assumption with one API call as soon as it blocks a design choice. DT does keep `sbomer:*` properties. *(004)*
+- **L18** Derive coverage expectations from the repo's language and build files, not just its package manifests. What the manifests leave out is the gap. *(005)*
+- **L19** Resolve floating image tags from the image's own env (`skopeo inspect`). It's exact, and nothing gets pulled or run. *(005)*
+- **L20** Expect NVD entries that match every version. Rank them, don't trust them. *(005)*

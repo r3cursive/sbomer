@@ -12,6 +12,7 @@ import { gaps, purlTypes } from "./inspect";
 import { normalize } from "./bom";
 import { addComponents, resolvePython } from "./layers/resolve";
 import { tagDev } from "./layers/scope";
+import { addRuntimes, scanRuntimes } from "./layers/runtimes";
 import { pick } from "./pick";
 import * as dt from "./dt";
 
@@ -51,6 +52,11 @@ async function scan(t: Target): Promise<void> {
     const r = await resolvePython(dir);
     raw = addComponents(raw, r.components);
     for (const f of r.failed) console.error(`  resolve skipped ${f}`);
+  }
+  if (config().scan.runtimes) {
+    const rt = await scanRuntimes(dir);
+    raw = addRuntimes(raw, rt.components);
+    for (const u of rt.unresolved) console.error(`  runtime unresolved ${u}`);
   }
   const { bom: tagged, tagged: devCount } = tagDev(raw, dir);
   const { bom, dropped } = normalize(tagged);

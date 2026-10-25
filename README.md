@@ -9,7 +9,7 @@ It started after the week of 2026-10-19, when PHP, Node.js (a Brotli RCE inside 
 Each repo is scanned in three layers and stored as CycloneDX in [Dependency-Track](https://dependencytrack.org/):
 
 1. **Dependencies** from lockfiles and manifests (syft).
-2. **Declared runtimes** from Dockerfile `FROM`, `.nvmrc`, CI setup steps *(stage 2)*.
+2. **Declared runtimes** from Dockerfile `FROM`, resolved to exact versions from the image env (`.nvmrc` and CI setup steps next).
 3. **Declared images and services** from compose files and Helm values *(stage 2)*.
 
 Dependency-Track matches the components against NVD and OSV.
@@ -20,7 +20,7 @@ Dependency-Track matches the components against NVD and OSV.
 |---|---|---|
 | 0 | Pinned tools, local Dependency-Track 5 | done |
 | 1 | Dependency layer → Dependency-Track | done (canary e2e passes) |
-| 2 | Runtime + service layers | next |
+| 2 | Runtime + service layers | runtimes from Dockerfile `FROM` done; `.nvmrc`, CI and compose next |
 | 3 | `query` and `report` | |
 | 4+ | Runtime internals, reachability, local-model triage, trust stores | planned |
 
